@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Queuing</title>
+	<script src="d3.v4.js"></script>
+	<script src="draw_d3_line.js"></script>
+	<script src="queuing_hw1.js"></script>
+	<script src="filesaver.js"></script>
+	<script src="jquery-3.1.1.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="d3.css">
+</head>
+<body>
+	intput means : <input type="text" id="input_mean" value="0.25,0.5,1,2">
+	<input type="button" id="input_click" value="submit">
+	<input type="button" id="download_rowdata" value="Download RowData">
+	<input type="button" id="download_Cumulative" value="Download Cumulative">
+	<input type="button" id="download_arrival" value="Download Arrival">
+	<br>
+	In the chart line is simulation and dot is theoretical.
+	<br>
+	<svg width="900" height="500" id="v1"></svg>
+	<svg width="900" height="500" id="v2"></svg>
+	<script type="text/javascript">
+		var mean_array = [0.25,0.5,1,2];
+		var st_array = new Array();
+		var th_array = new Array();
+		var mean_output_array = new Array();
+		var Cumulative = "";
+		for(mean in mean_array){
+			var mean_output_obj = new Object();
+			var exponential_inter_arrival_array = exponential_inter_arrival_generator_test(mean_array[mean]);
+			st_array.push(exponential_inter_arrival_array[0]);
+			th_array.push(exponential_inter_arrival_array[1]);	
+			mean_output_obj.mean = mean_array[mean];
+			mean_output_obj.data = exponential_inter_arrival_array[2];
+			mean_output_array.push(mean_output_obj);
+		}
+		
+		draw_d3(st_array, th_array, "CDF",'v1');
+
+		var st_pdf_array = new Array();
+		var th_pdf_array = new Array();
+		for(mean in mean_array){
+			var exponential_inter_arrival_array = exponential_unit_arrival_test(mean_array[mean]);
+			// console.log(exponential_inter_arrival_array);
+			st_pdf_array.push(exponential_inter_arrival_array[0]);
+			th_pdf_array.push(exponential_inter_arrival_array[1]);	
+		}
+
+		draw_d3(st_pdf_array, th_pdf_array, "PDF", 'v2');
+
+		$("#input_click").on("click",function(){
+			mean_output_array = [];
+			$("svg").html("");
+			var temp_array = new Array();
+			temp_array = $("#input_mean").val().split(',');
+			mean_array = temp_array;
+			st_array = [];
+			th_array = [];
+			for(mean in mean_array){
+				var mean_output_obj = new Object();
+				var exponential_inter_arrival_array = exponential_inter_arrival_generator_test(mean_array[mean]);
+				st_array.push(exponential_inter_arrival_array[0]);
+				th_array.push(exponential_inter_arrival_array[1]);	
+				mean_output_obj.mean = mean_array[mean];
+				mean_output_obj.data = exponential_inter_arrival_array[2];
+				mean_output_array.push(mean_output_obj);
+			}
+			draw_d3(st_array, th_array, "CDF",'v1');
+
+			st_pdf_array = [];
+			th_pdf_array = [];
+			for(mean in mean_array){
+				var exponential_inter_arrival_array = exponential_unit_arrival_test(mean_array[mean]);
+				st_pdf_array.push(exponential_inter_arrival_array[0]);
+				th_pdf_array.push(exponential_inter_arrival_array[1]);	
+			}
+			draw_d3(st_pdf_array, th_pdf_array, "PDF", 'v2');
+		});
+
+		$("#download_rowdata").on("click", function(){
+			for(i in mean_output_array){
+				var mean_output = mean_output_array[i];
+				var blob = new Blob([(mean_output.data)], {type: "text/plain;charset=utf-8"});
+				saveAs(blob, "RowData_"+(mean_output.mean).toString()+".txt");
+			}
+		});
+
+		function output_Cumulative(){
+			// var time_array = new Array();
+			var output_str = "mean     ";
+			for(i in mean_array){
+				var lable_str = mean_array[i].toString()+"(s)/"+mean_array[i].toString()+"(t)"
+				var tamp_lable_length = lable_str.length;
+				for(var j = 0; j < (16 - tamp_lable_length); j++){
+					lable_str = lable_str + " ";
+				}
+				output_str = output_str + lable_str;
+			}
+			output_str = output_str + "\n";
+			for(var i = 0; i < 50; i++){
+				var space = "";
+				for(var x = 0; x < (6 - ((i+1)*0.5).toString().length) ; x++ ){
+					space = space + " ";
+				}
+				// time_array[i] = ((i+1)*0.5).toString() + space;
+				output_str = output_str + ((i+1)*0.5).toString() + space;
+				
+				for(j in mean_array){
+					// time_array[i] = time_array[i] + " " + st_array[j].values[i].value.toFixed(4) + "," + th_array[j].values[i].value.toFixed(4);
+					output_str = output_str + "   " + st_array[j].values[i].value.toFixed(4) + "," + th_array[j].values[i].value.toFixed(4) ;
+				}
+				// time_array[i] = time_array[i] + "\n";
+				output_str = output_str + "\n";
+			}
+			return output_str;
+		}
+		
+		function output_arrival(){
+			// var time_array = new Array();
+			var output_str = "mean     ";
+			for(i in mean_array){
+				var lable_str = mean_array[i].toString()+"(s)/"+mean_array[i].toString()+"(t)"
+				var tamp_lable_length = lable_str.length;
+				for(var j = 0; j < (16 - tamp_lable_length); j++){
+					lable_str = lable_str + " ";
+				}
+				output_str = output_str + lable_str;
+			}
+			output_str = output_str + "\n";
+			for(var i = 0; i < 20; i++){
+				var space = "";
+				for(var x = 0; x < 6-i.toString().length ; x++ ){
+					space = space + " ";
+				}
+				// time_array[i] = ((i+1)*0.5).toString() + space;
+				output_str = output_str + i.toString() + space;
+				
+				for(j in mean_array){
+					// time_array[i] = time_array[i] + " " + st_array[j].values[i].value.toFixed(4) + "," + th_array[j].values[i].value.toFixed(4);
+					output_str = output_str + "   " + st_pdf_array[j].values[i].value.toFixed(4) + "," + th_pdf_array[j].values[i].value.toFixed(4) ;
+				}
+				// time_array[i] = time_array[i] + "\n";
+				output_str = output_str + "\n";
+			}
+			// console.log(output_str);
+			return output_str;
+		}
+
+		output_arrival();
+
+		$("#download_Cumulative").on('click',function(){
+			var blob = new Blob([output_Cumulative()], {type: "text/plain;charset=utf-8"});
+			saveAs(blob, "Cumulative.txt");
+		});
+
+		$("#download_arrival").on("click",function(){
+			var blob = new Blob([output_arrival()], {type: "text/plain;charset=utf-8"});
+			saveAs(blob, "arrival.txt");
+		});
+		
+	</script>
+</body>
+</html>
