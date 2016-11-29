@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+	<html>
+	<head>
+		<title>Queuing</title>
+		<meta charset="utf-8">
+		<script src="js/filesaver.js"></script>
+		<script src="js/jquery-3.1.1.min.js"></script>
+		<script src="js/queuing_hw2.js"></script>
+	</head>
+	<script type="text/javascript">
+		var input_date = new input_date();
+		console.log("****************");
+		console.log("M/M/1 (landa = 1~5, mean = 5)");
+		console.log("****************");
+		input_date.service_generator(2,5);
+		for(var arrival = 1; arrival< 5; arrival++){
+			input_date.arrival_generator(arrival);
+			MMmk_model(1, arrival, 5, 0, input_date.get_arrival(arrival), input_date.get_service(5));
+		}
+
+		console.log("****************");
+		console.log("M/M/1/k & M/M/2/k (k = 4, 6, 8, 10, 12, mean = 5)");
+		console.log("****************");
+		for(var k = 4; k <=12 ; k+=2){
+			for(var arrival = 1; arrival <=7; arrival++){
+				input_date.arrival_generator(arrival);
+				MMmk_model(1, arrival, 5, k, input_date.get_arrival(arrival), input_date.get_service(5));	
+				MMmk_model(2, arrival, 5, k, input_date.get_arrival(arrival), input_date.get_service(5));	
+			}
+		}
+		
+		console.log("****************");
+		console.log("M/M/1 & M/M/2 (landa = 1~7, mean1 = 5, mean2 = 2.5)");
+		console.log("****************");
+		input_date.service_generator(2,2.5);
+		for(var arrival = 1; arrival< 7; arrival++){
+			input_date.arrival_generator(arrival);
+			MMmk_model(1, arrival, 5, 0, input_date.get_arrival(arrival), input_date.get_service(5));
+			MMmk_model(2, arrival, 2.5, 0, input_date.get_arrival(arrival), input_date.get_service(2.5));
+		}
+
+		console.log("****************");
+		console.log("M/M/1/k & M/M/2/k (k = 4, 6, 8, 10, 12, landa = 1~7, mean1 = 5, mean2 = 2.5)");
+		console.log("****************");
+		for(var k  = 4; k <= 12; k+=2){
+			for(var arrival = 1; arrival< 7; arrival++){
+				input_date.arrival_generator(arrival);
+				MMmk_model(1, arrival, 5, k, input_date.get_arrival(arrival), input_date.get_service(5));
+				MMmk_model(2, arrival, 2.5, k, input_date.get_arrival(arrival), input_date.get_service(2.5));
+			}
+		}
+
+		console.log("****************");
+		console.log("M/M/m/m (m = 2~5, landa = 5, mean = 2)");
+		console.log("****************");
+		input_date.service_generator(5,2);
+		input_date.arrival_generator(5);
+		for(var m = 2; m <=5; m++){
+			MMmk_model(m, 5, 2, m, input_date.get_arrival(5), input_date.get_service(2));
+		}
+		function output_row_data() {
+			for(var arrival_rate in input_date.arrival){
+				var temp_string = '';
+				var temp_file_name = "row_data_arrival_rate_"+arrival_rate+".txt";
+				for(var i = 0; i < input_date.arrival[arrival_rate].data.length; i++){
+					temp_string = temp_string + input_date.arrival[arrival_rate].data[i].toFixed(4).toString() + "\n";
+				}
+				// console.log(temp_string);
+				var blob = new Blob([temp_string], {type: "text/plain;charset=utf-8"});
+				saveAs(blob, temp_file_name);
+			}
+			for(var service_rate in input_date.service){
+				for(var index in input_date.service[service_rate]){
+					var temp_string = '';
+					var temp_file_name = "row_data_service_rate_"+service_rate.toString()+"-"+index.toString()+".txt";
+					for(var i = 0; i < input_date.service[service_rate][index].data.length; i++){
+						temp_string = temp_string + input_date.service[service_rate][index].data[i].toFixed(4).toString() + "\n";
+					}
+					var blob = new Blob([temp_string], {type: "text/plain;charset=utf-8"});
+					saveAs(blob, temp_file_name);
+				}
+			}
+		}
+		output_row_data();
+	</script>
+	<body>
+	
+	</body>
+	</html>	
