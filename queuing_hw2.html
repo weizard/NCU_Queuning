@@ -39,13 +39,25 @@
 			MMmk_model(2, arrival, 2.5, 0, input_date.get_arrival(arrival), input_date.get_service(2.5));
 		}
 
+		var temp_blocking_rate = new Object();
+
 		console.log("****************");
 		console.log("M/M/1/k & M/M/2/k (k = 4, 6, 8, 10, 12, landa = 1~7, mean1 = 5, mean2 = 2.5)");
 		console.log("****************");
 		for(var k  = 4; k <= 12; k+=2){
-			for(var arrival = 1; arrival< 7; arrival++){
+			temp_blocking_rate.arrival = "   ";
+			if(k<10){
+				temp_blocking_rate[k] = " " + k.toString();
+			}
+			else{
+				temp_blocking_rate[k] = "" + k.toString();
+			}
+			for(var arrival = 1; arrival<= 7; arrival++){
 				input_date.arrival_generator(arrival);
-				MMmk_model(1, arrival, 5, k, input_date.get_arrival(arrival), input_date.get_service(5));
+				temp_blocking_rate.arrival = temp_blocking_rate.arrival+" "+arrival.toString()+"_st   "+arrival.toString()+"_th  ";
+				var temp;
+				temp = MMmk_model(1, arrival, 5, k, input_date.get_arrival(arrival), input_date.get_service(5));
+				temp_blocking_rate[k] = temp_blocking_rate[k]+" "+temp.br_st.toFixed(4).toString()+" "+temp.br_th.toFixed(4).toString();
 				MMmk_model(2, arrival, 2.5, k, input_date.get_arrival(arrival), input_date.get_service(2.5));
 			}
 		}
@@ -81,7 +93,14 @@
 				}
 			}
 		}
-		output_row_data();
+		// output_row_data();
+		// console.log(temp_blocking_rate);
+		var temp_output = "";
+		temp_output = temp_output + temp_blocking_rate.arrival + "\n";
+		for(var i = 4; i <= 12; i+=2){
+			temp_output = temp_output + temp_blocking_rate[i] + "\n";
+		}
+		console.log(temp_output);
 	</script>
 	<body>
 	
