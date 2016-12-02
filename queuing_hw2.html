@@ -96,6 +96,7 @@
 		for(var m = 2; m <=5; m++){
 			MMmk_model(m, 5, 2, m, input_date.get_arrival(5), input_date.get_service(2));
 		}
+
 		function output_row_data() {
 			for(var arrival_rate in input_date.arrival){
 				var temp_string = '';
@@ -129,6 +130,10 @@
 		for(var i = 4; i <= 12; i+=2){
 			temp_output_blocking_rate = temp_output_blocking_rate + "\n" + temp_blocking_rate[i] ;
 		}
+		function output_blocking_rate(){
+			var blob = new Blob([temp_output_blocking_rate], {type: "text/plain;charset=utf-8"});
+			saveAs(blob, "blocking_rate.csv");
+		}
 		console.log(temp_output_blocking_rate);
 
 		console.log("****************");
@@ -139,12 +144,24 @@
 		for(var i = 4; i <= 12; i+=2){
 			temp_output_nq = temp_output_nq + "\n" + temp_nq[i] ;
 		}
+		function output_nq(){
+			var blob = new Blob([temp_output_nq], {type: "text/plain;charset=utf-8"});
+			saveAs(blob, "nq.csv");
+		}
 		console.log(temp_output_nq);
 
 		$("#area").html(create_table("blocking rate",temp_output_blocking_rate)+create_table("Nq ",temp_output_nq));
+		$("#btn").html('<input type="button"  id="button_blocking_rate" value="blocking rate"><input type="button"  id="button_nq" value="nq"><input type="button"  id="button_row_data" value="row data">');
+		$("#button_nq").click(function(){output_nq()});
+		$("#button_blocking_rate").click(function(){output_blocking_rate()});
+		$("#button_row_data").click(function(){output_row_data()});
+
 	});
 	</script>
 	<body>
-	<div id="area"></div>
+	<div id="btn"></div>
+	<div id="area">
+		Please wait!
+	</div>
 	</body>
 	</html>	
