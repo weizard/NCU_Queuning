@@ -13,6 +13,14 @@ exponential_rand.prototype.exponential_rand_generator = function(landa){
 		this.data.push(x);
 	}
 }
+exponential_rand.prototype.d_rand_generator = function(landa){
+	for(i = 0; i< this.data_size; i++){
+		// var rand_value = Math.random();
+		// rand_value = Math.floor(rand_value*Random_Precision)/Random_Precision;
+		// var x = Math.log(1-rand_value)/(-landa);
+		this.data.push(landa);
+	}
+}
 exponential_rand.prototype.init_picker = function(){
 	this.index = 0;
 }
